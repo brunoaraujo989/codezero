@@ -25,9 +25,9 @@ const navGroups = [
 
 function Logo({ compact = false }: { compact?: boolean }) {
   return <Link href="/" className="flex items-center gap-3 group" aria-label="CodeZero home">
-    <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#b795ff] via-[#7a5af0] to-[#46dcd5] text-[#0b0b13] shadow-[0_0_24px_rgba(140,105,248,.38)]">
+    <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-[#b9ee83] text-[#14180e] shadow-[0_8px_24px_rgba(185,238,131,.14)]">
       <span className="font-mono text-[17px] font-bold">&gt;_</span>
-      <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-[#54e7dc] shadow-[0_0_10px_#54e7dc]" />
+      <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-[#b9ee83] shadow-[0_0_8px_#b9ee83]" />
     </span>
     {!compact && <span className="font-display text-lg font-bold tracking-[-.04em] text-white">code<span className="text-[#a88cff]">zero</span></span>}
   </Link>;
@@ -37,7 +37,7 @@ function NavLink({ href, label, icon: Icon, collapsed, onClick }: { href: string
   const [location] = useLocation();
   const active = location === href || (href === '/app/dashboard' && location === '/app');
   return <Link href={href} onClick={onClick} className={`group relative flex items-center gap-3 rounded-lg border px-3 py-2.5 text-[13px] font-semibold transition-all duration-200 ${active ? 'border-[#9b7bff]/25 bg-[#9b7bff]/[.06] text-[#e8e1ff]' : 'border-transparent text-[#7f879e] hover:bg-white/[.035] hover:text-[#e8eaf3]'}`}>
-    {active && <span className="absolute -left-[1px] top-2 bottom-2 w-[2px] rounded-full bg-[#9b7bff] shadow-[0_0_12px_#9b7bff]" />}
+    {active && <span className="absolute -left-[1px] top-2 bottom-2 w-[2px] rounded-full bg-[#b9ee83] shadow-[0_0_8px_#b9ee83]" />}
     <Icon size={17} strokeWidth={active ? 2.2 : 1.8} className={active ? 'text-[#a790ff]' : 'text-[#727a91] group-hover:text-[#c6cbe0]'} />
     {!collapsed && <span className="truncate">{label}</span>}
     {!collapsed && active && <ChevronRight size={13} className="ml-auto text-[#8d77ed]" />}

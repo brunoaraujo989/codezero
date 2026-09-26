@@ -36,7 +36,7 @@ function Logo({ compact = false }: { compact?: boolean }) {
 function NavLink({ href, label, icon: Icon, collapsed, onClick }: { href: string; label: string; icon: typeof LayoutDashboard; collapsed: boolean; onClick?: () => void }) {
   const [location] = useLocation();
   const active = location === href || (href === '/app/dashboard' && location === '/app');
-  return <Link href={href} onClick={onClick} className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all duration-200 ${active ? 'bg-[#8c73f8]/15 text-[#c9bdff]' : 'text-[#7f879e] hover:bg-white/[.04] hover:text-[#e8eaf3]'}`}>
+  return <Link href={href} onClick={onClick} className={`group relative flex items-center gap-3 rounded-lg border px-3 py-2.5 text-[13px] font-semibold transition-all duration-200 ${active ? 'border-[#9b7bff]/25 bg-[#9b7bff]/[.06] text-[#e8e1ff]' : 'border-transparent text-[#7f879e] hover:bg-white/[.035] hover:text-[#e8eaf3]'}`}>
     {active && <span className="absolute -left-[1px] top-2 bottom-2 w-[2px] rounded-full bg-[#9b7bff] shadow-[0_0_12px_#9b7bff]" />}
     <Icon size={17} strokeWidth={active ? 2.2 : 1.8} className={active ? 'text-[#a790ff]' : 'text-[#727a91] group-hover:text-[#c6cbe0]'} />
     {!collapsed && <span className="truncate">{label}</span>}
@@ -47,11 +47,17 @@ function NavLink({ href, label, icon: Icon, collapsed, onClick }: { href: string
 export default function AppShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [query, setQuery] = useState('');
   const [location, navigate] = useLocation();
   const searchResults = query.trim().length > 1 ? globalResults.filter((item) => `${item.title} ${item.description} ${item.type}`.toLowerCase().includes(query.toLowerCase())) : [];
 
-  useEffect(() => { setMobileOpen(false); }, [location]);
+  useEffect(() => {
+    setMobileOpen(false);
+    setIsNavigating(true);
+    const timer = window.setTimeout(() => setIsNavigating(false), 260);
+    return () => window.clearTimeout(timer);
+  }, [location]);
 
   return <div className="min-h-screen bg-[#080a11] text-[#f3f5fb]">
     <aside className={`fixed inset-y-0 left-0 z-50 flex w-[244px] flex-col border-r border-white/[.07] bg-[#0b0e17]/95 px-3 py-5 backdrop-blur-xl transition-transform duration-200 lg:translate-x-0 ${collapsed ? 'lg:w-[78px]' : ''} ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
@@ -97,7 +103,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="min-h-[calc(100vh-70px)]">{children}</main>
+      <main className="relative min-h-[calc(100vh-70px)]">
+        {isNavigating && <div className="route-loader" aria-label="Carregando página" />}
+        <div className="route-enter">{children}</div>
+      </main>
     </div>
   </div>;
 }

@@ -5,6 +5,8 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import AppShell from '@/components/AppShell';
 import Landing from '@/pages/Landing';
 import GuestPage, { getGuestName } from '@/pages/GuestPage';
+import AuthPage from '@/pages/AuthPage';
+import { useAuth } from '@/_core/hooks/useAuth';
 import { Courses, Dashboard, Exercises, GitHubPage, Lab, Profile, Projects, ProgressPage, Quizzes, SettingsPage, Tracks, Videos } from '@/pages/Platform';
 
 function PlatformRouter() {
@@ -12,7 +14,7 @@ function PlatformRouter() {
   const go = (path: string) => navigate(path);
   const page = location.split('/')[2] || 'dashboard';
   const content = page === 'dashboard' ? <Dashboard go={go} />
-    : page === 'courses' ? <Courses go={go} />
+    : page === 'courses' ? <Courses go={go} courseId={location.split('/')[3]} />
     : page === 'tracks' ? <Tracks go={go} />
     : page === 'exercises' ? <Exercises />
     : page === 'quizzes' ? <Quizzes />
@@ -30,10 +32,14 @@ function PlatformRouter() {
 function AppRoutes() {
   const [location, navigate] = useLocation();
   const guest = getGuestName();
+  const { isAuthenticated, loading } = useAuth();
   if (location === '/') return <Landing />;
-  if (location === '/guest' || location === '/auth' || location === '/auth/login' || location === '/auth/signup' || location === '/criar-conta') return <GuestPage />;
+  if (location === '/guest') return <GuestPage />;
+  if (location === '/auth' || location === '/auth/login') return <AuthPage initialMode='login' />;
+  if (location === '/auth/signup' || location === '/criar-conta') return <AuthPage initialMode='signup' />;
   if (location.startsWith('/app')) {
-    if (!guest) { navigate('/guest'); return null; }
+    if (loading) return null;
+    if (!guest && !isAuthenticated) { navigate('/guest'); return null; }
     return <PlatformRouter />;
   }
   return <Landing />;

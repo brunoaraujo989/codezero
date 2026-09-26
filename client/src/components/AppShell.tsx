@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Bell, BookOpen, ChevronRight, CircleHelp, Compass, Flame, FolderKanban, Gauge, Github, Grid2X2, LayoutDashboard, Menu, PanelLeftClose, PanelLeftOpen, PlayCircle, Search, Settings, Sparkles, TerminalSquare, Trophy, UserRound, X, Zap } from 'lucide-react';
 import { globalResults } from '@/data/content';
+import { getGuestName, leaveGuest } from '@/pages/GuestPage';
 
 const navGroups = [
   { label: 'APRENDER', items: [
@@ -50,6 +51,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const [query, setQuery] = useState('');
   const [location, navigate] = useLocation();
+  const [guestName] = useState(() => getGuestName() || 'Convidado');
+  const guestInitials = guestName.slice(0, 2).toUpperCase();
   const searchResults = query.trim().length > 1 ? globalResults.filter((item) => `${item.title} ${item.description} ${item.type}`.toLowerCase().includes(query.toLowerCase())) : [];
 
   useEffect(() => {
@@ -80,7 +83,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <div className="mt-2 flex justify-between text-[10px] font-medium text-[#737d98]"><span>4 / 6 sessões</span><span className="text-[#b5a6ff]">68%</span></div>
       </div>}
       <div className={`mt-5 border-t border-white/[.07] pt-4 ${collapsed ? 'flex justify-center' : ''}`}>
-        {!collapsed ? <Link href="/app/settings" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-[#737b91] hover:bg-white/[.04] hover:text-white"><Settings size={17} /><span>Configurações</span></Link> : <Link href="/app/settings" className="rounded-xl p-2 text-[#737b91] hover:bg-white/[.04] hover:text-white"><Settings size={18} /></Link>}
+        {!collapsed ? <div className="space-y-1"><Link href="/app/settings" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-[#737b91] hover:bg-white/[.04] hover:text-white"><Settings size={17} /><span>Configurações</span></Link><button onClick={() => { leaveGuest(); navigate('/guest'); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-semibold text-[#737b91] hover:bg-white/[.04] hover:text-white"><UserRound size={17} /><span>Sair do convidado</span></button></div> : <button onClick={() => { leaveGuest(); navigate('/guest'); }} className="rounded-xl p-2 text-[#737b91] hover:bg-white/[.04] hover:text-white" aria-label="Sair do convidado"><UserRound size={18} /></button>}
       </div>
     </aside>
 
@@ -99,7 +102,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <div className="ml-auto flex items-center gap-2.5 sm:gap-4">
             <button className="relative rounded-xl p-2 text-[#7b849a] hover:bg-white/[.05] hover:text-white" aria-label="Notificações"><Bell size={18} /><span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#55e7dd] shadow-[0_0_7px_#55e7dd]" /></button>
             <div className="hidden h-7 w-px bg-white/[.08] sm:block" />
-            <Link href="/app/profile" className="flex items-center gap-2.5 rounded-xl p-1.5 pr-2 hover:bg-white/[.04]"><div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#a888ff] to-[#4eddd4] font-display text-[12px] font-bold text-[#11101b]">AS</div><div className="hidden text-left sm:block"><p className="text-[11px] font-bold text-[#eef0f8]">Alex Silva</p><p className="text-[10px] text-[#717b91]">Nível 07</p></div></Link>
+            <Link href="/app/profile" className="flex items-center gap-2.5 rounded-xl p-1.5 pr-2 hover:bg-white/[.04]"><div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#b9ee83] font-display text-[12px] font-bold text-[#14180e]">{guestInitials}</div><div className="hidden text-left sm:block"><p className="text-[11px] font-bold text-[#eef0f8]">{guestName}</p><p className="text-[10px] text-[#717b91]">Convidado</p></div></Link>
           </div>
         </div>
       </header>

@@ -1,74 +1,61 @@
 # CodeZero — Aprenda. Pratique. Evolua.
 
-Plataforma prática de estudos de programação com trilhas, cursos, gamificação, laboratório de terminal simulado e autenticação segura.
+Plataforma prática de estudos de programação com trilhas, cursos, gamificação e laboratório de terminal simulado.
+
+## Modo convidado
+
+O CodeZero funciona sem cadastro, senha ou login externo. Na entrada, a pessoa escolhe entre dois perfis:
+
+- **Cookie**
+- **Pê**
+
+A escolha é salva no `localStorage` do próprio navegador. Assim, a pessoa pode sair pelo menu **Sair do convidado** e entrar novamente escolhendo o mesmo perfil.
+
+> Este é um modo local simples: o progresso fica salvo neste navegador e não sincroniza entre dispositivos.
 
 ## Stack
 
 - React 19 + TypeScript
-- Vite + Express + tRPC
-- Tailwind CSS 4
-- Drizzle ORM
-- SQLite/libSQL (`@libsql/client`)
-- Manus OAuth — sem senhas armazenadas pela aplicação
-- Wouter, Lucide React e Sonner
+- Vite + Tailwind CSS 4
+- Wouter para rotas client-side
+- Lucide React e Sonner
+- SQLite/libSQL mantido no projeto para evolução futura, mas o deploy atual é estático
 
 ## Desenvolvimento local
 
 ```bash
 pnpm install
-DATABASE_URL=file:./data/codezero.db pnpm db:push
 pnpm dev
 ```
 
 O app inicia em `http://localhost:3000`.
 
-## Validação
+## Build e validação
 
 ```bash
 pnpm run check
 pnpm test
 pnpm run build
+pnpm run preview
 ```
 
-## Autenticação
-
-As rotas `/auth`, `/auth/login` e `/auth/signup` usam o OAuth oficial do Manus. O primeiro acesso cria o usuário automaticamente na tabela `users`; não existe formulário de senha nem senha salva no navegador ou no banco do CodeZero.
-
-As rotas `/app/*` exigem uma sessão autenticada. O logout invalida o cookie de sessão e limpa o estado local.
-
-## Banco SQLite/libSQL
-
-Por padrão, o desenvolvimento local usa:
-
-```text
-file:./data/codezero.db
-```
-
-O arquivo local é ignorado pelo Git. Para deploy na Vercel, o filesystem de uma função é efêmero; portanto, SQLite em arquivo local **não é persistente entre deploys/requisições**. Para produção, use um banco compatível com SQLite/libSQL, como Turso, e configure a `DATABASE_URL` correspondente na Vercel.
+O build final fica em `dist/`.
 
 ## Deploy na Vercel
 
-1. Importe este repositório público na Vercel.
-2. Use `pnpm run build` como Build Command.
-3. Configure as variáveis do runtime no painel da Vercel:
-   - `DATABASE_URL`
-   - `JWT_SECRET`
-   - `VITE_APP_ID`
-   - `VITE_OAUTH_PORTAL_URL`
-   - `OAUTH_SERVER_URL`
-   - `OWNER_OPEN_ID` (opcional)
-   - `BUILT_IN_FORGE_API_URL` e `BUILT_IN_FORGE_API_KEY` quando os recursos Manus forem usados.
-4. Aponte o callback OAuth para `/api/oauth/callback` no domínio publicado.
-5. Use um banco libSQL/Turso persistente em vez de `file:./data/codezero.db` no ambiente de produção.
+1. Importe o repositório na Vercel.
+2. Framework: **Vite** ou **Other**.
+3. Build Command: `pnpm run build`.
+4. Output Directory: `dist`.
+5. A configuração `vercel.json` mantém as rotas client-side funcionando ao abrir links diretamente.
 
-> Nunca envie `.env`, tokens, `JWT_SECRET` ou credenciais para o repositório público.
+Não são necessárias variáveis de ambiente para o modo convidado.
 
 ## Rotas principais
 
 - `/` — Home pública
-- `/auth` — Entrar
-- `/auth/signup` e `/criar-conta` — Criar perfil
-- `/app/dashboard` — Dashboard protegido
+- `/guest` — Escolha Cookie ou Pê
+- `/app/dashboard` — Dashboard
 - `/app/courses` — Cursos
 - `/app/tracks` — Trilhas
 - `/app/exercises` — Exercícios

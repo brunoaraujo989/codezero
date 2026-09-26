@@ -1,42 +1,36 @@
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
-import ErrorBoundary from "./components/ErrorBoundary";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useLocation } from 'wouter';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import AppShell from '@/components/AppShell';
+import Landing from '@/pages/Landing';
+import { Courses, Dashboard, Exercises, GitHubPage, Lab, Profile, Projects, ProgressPage, Quizzes, SettingsPage, Tracks, Videos } from '@/pages/Platform';
 
-
-function Router() {
-  return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
-  );
+function PlatformRouter() {
+  const [location, navigate] = useLocation();
+  const go = (path: string) => navigate(path);
+  const page = location.split('/')[2] || 'dashboard';
+  const content = page === 'dashboard' ? <Dashboard go={go} />
+    : page === 'courses' ? <Courses go={go} />
+    : page === 'tracks' ? <Tracks go={go} />
+    : page === 'exercises' ? <Exercises />
+    : page === 'quizzes' ? <Quizzes />
+    : page === 'projects' ? <Projects />
+    : page === 'videos' ? <Videos />
+    : page === 'lab' ? <Lab />
+    : page === 'github' ? <GitHubPage />
+    : page === 'progress' ? <ProgressPage />
+    : page === 'profile' ? <Profile />
+    : page === 'settings' ? <SettingsPage />
+    : <Dashboard go={go} />;
+  return <AppShell>{content}</AppShell>;
 }
-
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
-  return (
-    <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
-  );
+  const [location] = useLocation();
+  return <ErrorBoundary><ThemeProvider defaultTheme="dark"><Toaster theme="dark" position="bottom-right" /><PlatformRouteGuard location={location} /></ThemeProvider></ErrorBoundary>;
 }
+
+function PlatformRouteGuard({ location }: { location: string }) { return location === '/' ? <Landing /> : <PlatformRouter />; }
 
 export default App;

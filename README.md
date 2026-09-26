@@ -1,83 +1,74 @@
 # CodeZero — Aprenda. Pratique. Evolua.
 
-Plataforma front-end de estudos de programação, com conteúdo local/static, navegação por trilhas, gamificação e laboratório de terminal simulado.
+Plataforma prática de estudos de programação com trilhas, cursos, gamificação, laboratório de terminal simulado e autenticação segura.
 
 ## Stack
 
 - React 19 + TypeScript
-- Vite
+- Vite + Express + tRPC
 - Tailwind CSS 4
-- Wouter para rotas client-side
-- Lucide React para ícones
-- Sonner para feedbacks e toasts
-
-## Instalação
-
-```bash
-npm install
-```
-
-ou, usando pnpm:
-
-```bash
-pnpm install
-```
+- Drizzle ORM
+- SQLite/libSQL (`@libsql/client`)
+- Manus OAuth — sem senhas armazenadas pela aplicação
+- Wouter, Lucide React e Sonner
 
 ## Desenvolvimento local
 
 ```bash
-npm run dev
+pnpm install
+DATABASE_URL=file:./data/codezero.db pnpm db:push
+pnpm dev
 ```
 
-O Vite inicia o app em `http://localhost:3000`.
+O app inicia em `http://localhost:3000`.
 
-## Build
+## Validação
 
 ```bash
-npm run build
+pnpm run check
+pnpm test
+pnpm run build
 ```
 
-Para validar os tipos:
+## Autenticação
 
-```bash
-npm run check
+As rotas `/auth`, `/auth/login` e `/auth/signup` usam o OAuth oficial do Manus. O primeiro acesso cria o usuário automaticamente na tabela `users`; não existe formulário de senha nem senha salva no navegador ou no banco do CodeZero.
+
+As rotas `/app/*` exigem uma sessão autenticada. O logout invalida o cookie de sessão e limpa o estado local.
+
+## Banco SQLite/libSQL
+
+Por padrão, o desenvolvimento local usa:
+
+```text
+file:./data/codezero.db
 ```
 
-## Produção
-
-```bash
-npm run start
-```
+O arquivo local é ignorado pelo Git. Para deploy na Vercel, o filesystem de uma função é efêmero; portanto, SQLite em arquivo local **não é persistente entre deploys/requisições**. Para produção, use um banco compatível com SQLite/libSQL, como Turso, e configure a `DATABASE_URL` correspondente na Vercel.
 
 ## Deploy na Vercel
 
-1. Importe o repositório na Vercel.
-2. Use `npm run build` como build command.
-3. O projeto é uma SPA: configure fallback para `index.html` se o provedor não fizer isso automaticamente.
-4. Publique.
+1. Importe este repositório público na Vercel.
+2. Use `pnpm run build` como Build Command.
+3. Configure as variáveis do runtime no painel da Vercel:
+   - `DATABASE_URL`
+   - `JWT_SECRET`
+   - `VITE_APP_ID`
+   - `VITE_OAUTH_PORTAL_URL`
+   - `OAUTH_SERVER_URL`
+   - `OWNER_OPEN_ID` (opcional)
+   - `BUILT_IN_FORGE_API_URL` e `BUILT_IN_FORGE_API_KEY` quando os recursos Manus forem usados.
+4. Aponte o callback OAuth para `/api/oauth/callback` no domínio publicado.
+5. Use um banco libSQL/Turso persistente em vez de `file:./data/codezero.db` no ambiente de produção.
 
-## Variáveis de ambiente
+> Nunca envie `.env`, tokens, `JWT_SECRET` ou credenciais para o repositório público.
 
-O MVP não exige variáveis de ambiente. O catálogo é local e o Termux Lab trabalha exclusivamente com resultados simulados — nenhum comando é executado no servidor.
-
-Quando login, banco de dados, sincronização, ranking, favoritos, comentários, notificações ou IA tutor forem adicionados, documente as variáveis correspondentes aqui e mova o conteúdo sensível para um backend.
-
-## Estrutura principal
-
-```text
-client/src/
-  components/AppShell.tsx  # sidebar, topbar e busca global
-  data/content.ts          # catálogo local separado da interface
-  pages/Landing.tsx        # home pública
-  pages/Platform.tsx       # páginas da plataforma
-  App.tsx                  # roteamento client-side
-  index.css                # tokens e estética Neon Observatory
-```
-
-## Rotas
+## Rotas principais
 
 - `/` — Home pública
-- `/app/dashboard` — Dashboard
+- `/auth` — Entrar
+- `/auth/signup` e `/criar-conta` — Criar perfil
+- `/app/dashboard` — Dashboard protegido
 - `/app/courses` — Cursos
 - `/app/tracks` — Trilhas
 - `/app/exercises` — Exercícios
@@ -85,7 +76,6 @@ client/src/
 - `/app/projects` — Projetos
 - `/app/videos` — Vídeos
 - `/app/lab` — Termux Lab
-- `/app/github` — GitHub
 - `/app/progress` — Progresso
 - `/app/profile` — Perfil
 - `/app/settings` — Configurações
